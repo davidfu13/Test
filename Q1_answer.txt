@@ -1,0 +1,8 @@
+Q1:
+1. 假如data是可以分散存放在10台machines上的話
+        利用一個獨立的server負責接收data，data一進來先放在此server的queue中，quene一旦開始收到第一份data就馬上把它distribute到10台machine中的其中1台(可利用hash function來算說要distribute到哪一台machine)，而在傳輸第一份data的同時，也可以開始平行處理第二份、第三份...等data，因為這些data是互相獨立且是利用不同的route傳到不同的machine的。
+        E.g. 今天若server接收到一份5TB的file，我們可以不用等到5TB都收完之後才開始distribute到不同的machine，而是可以把5TB切成好幾個chunk，例如5mb的chunk，這樣一收到5mb就可以開始distribute並且可以同時處理之後的chunks，而到時候要把整個5TB的file組起來的時候可以根據當初hash function算出來的值，再到對應的machine取出chunk。
+ 
+2. 假如是同一份data必須copy在10台machines
+        如果client直接將data一次上傳到我們的10台machine，因為我們10台machine很有可能是在同一個local network，所以client等於要一次傳送10倍的data量，經由同一個外部network、同一個路由，進到我們的local network，因此第一台machine收完資料後可能第二台之後的machine才開始可以收。
+所以我們也可以利用設置一個獨立的server的方式，讓client先將data船到此server的queue，此server再透過內部網路分送給10台machine。或是每一個machine也可以有一個queue，這樣server就可以先傳給其中一台machine，這台machine再傳給另外2台，再傳給4台…一直到十台都收到data為止。
